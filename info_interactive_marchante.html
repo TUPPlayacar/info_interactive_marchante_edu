@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Manual de Convivencia y Calidad del Marchante | Interactivo</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f4f6f9;
+            color: #1e2a32;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ========= SIDEBAR MODERNA (SOLO ICONOS + TOOLTIP DESLIZANTE) ========= */
+        .sidebar-container {
+            width: 85px;
+            position: fixed;
+            height: 100vh;
+            z-index: 1050;
+            background: #ffffff;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+
+        .mcd-menu {
+            list-style: none;
+            padding: 20px 0 20px 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            justify-content: flex-start;
+        }
+
+        /* Espaciador para empujar el perfil hacia abajo */
+        .menu-spacer {
+            flex: 1;
+        }
+
+        .mcd-menu li {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mcd-menu li a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            width: 52px;
+            height: 52px;
+            background: #f8f9fc;
+            border-radius: 18px;
+            color: #5f6c7a;
+            transition: all 0.25s ease;
+            font-size: 26px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .mcd-menu li a i {
+            font-size: 26px;
+            width: auto;
+            margin: 0;
+        }
+
+        .mcd-menu li a.active {
+            background: #e67e22;
+            color: white;
+            box-shadow: 0 6px 12px rgba(230,126,34,0.25);
+        }
+
+        .mcd-menu li:hover > a {
+            background: #f0e9e3;
+            color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        /* Tooltip tipo desliz debajo del icono */
+        .menu-tooltip {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: #2c3e4e;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 28px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            pointer-events: none;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+            text-align: center;
+            line-height: 1.3;
+        }
+        .menu-tooltip small {
+            font-size: 10px;
+            font-weight: normal;
+            display: block;
+            opacity: 0.8;
+        }
+        .mcd-menu li:hover .menu-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            margin-left: 85px;
+            padding: 20px 30px;
+            transition: all 0.2s;
+        }
+
+        /* Header degradado */
+        header {
+            background: linear-gradient(135deg, #0f2027, #2c5364);
+            color: white;
+            text-align: center;
+            padding: 32px 20px;
+            border-radius: 32px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Títulos de sección con colores */
+        .section-title {
+            text-align: center;
+            margin: 45px 0 25px;
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        /* Asignación de color a cada título */
+        .title-problema { color: #c0392b; }
+        .title-kpi { color: #2c7da0; }
+        .title-ruta { color: #2e7d32; }
+        .title-plan { color: #e67e22; }
+        .title-exito { color: #b68b40; }
+
+        /* Grids y Cards mejoradas */
+        .problem-grid, .kpi-grid, .plan-grid, .exito-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card-custom {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 16px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.25s ease, box-shadow 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+        }
+
+        /* BORDES LATERALES SEGÚN CATEGORÍA */
+        .problem-card {
+            border-left: 6px solid #dc3545;
+            background: #fff8f8;
+        }
+        .kpi-card {
+            border-left: 6px solid #2c7da0;
+            background: #f4fafd;
+        }
+        .plan-item {
+            border-left: 6px solid #e67e22;
+            background: #fffaf3;
+        }
+        .exito-card {
+            border-left: 6px solid #f4b942;
+            background: #fffcf0;
+        }
+
+        /* Step de ruta (acordeón) */
+        .ruta-accordion-item {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border-left: 6px solid #2e7d32;
+            transition: all 0.2s;
+        }
+        .step-header {
+            padding: 18px 24px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: #ffffff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+        }
+        .step-header:hover {
+            background: #f0f9ef;
+        }
+        .step-header strong {
+            color: #1e4a2a;
+            font-size: 1.05rem;
+        }
+        .toggle-icon {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2e7d32;
+            transition: transform 0.2s;
+        }
+        .step-details {
+            background: #fefef5;
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.2s;
+            border-top: 1px solid #e0e8cf;
+        }
+        .step-details.show {
+            max-height: 700px;
+            padding: 20px 24px 24px 24px;
+        }
+        .detail-block {
+            background: #f8fdf6;
+            padding: 14px 18px;
+            border-radius: 20px;
+            margin: 12px 0;
+            border-left: 4px solid #88b04b;
+        }
+        .survey-example {
+            background: #ecf3e8;
+            border-radius: 20px;
+            padding: 14px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        /* animación girar + descripcion en problemas */
+        .problem-card {
+            transition: transform 0.3s ease, background 0.2s;
+        }
+        .rotate-desc-active {
+            transform: rotate(1deg) scale(1.02);
+            background: #fff0f0;
+        }
+
+        /* tip auditoría */
+        .tip-auditoria {
+            background: #eef4fc;
+            border-radius: 16px;
+            padding: 12px;
+            border-left: 4px solid #2c5364;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 35px 20px;
+            background: #1c3c46;
+            color: #f0ede8;
+            margin-top: 60px;
+            border-radius: 32px 32px 0 0;
+        }
+
+        /* Modal personalizado (transición suave) */
+        .modal-creditos .modal-content {
+            border-radius: 28px;
+            border: none;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .modal-creditos .modal-header {
+            background: linear-gradient(120deg, #1e2f3a, #2c5364);
+            color: white;
+            border-bottom: none;
+            padding: 1.2rem 1.5rem;
+        }
+        .modal-creditos .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        .modal-creditos .modal-body {
+            padding: 1.8rem;
+            background: #fffef7;
+        }
+        .credito-item {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e0d6cc;
+        }
+        .credito-icon {
+            width: 38px;
+            color: #e67e22;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        .credito-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+        .credito-text strong {
+            color: #1e4663;
+            font-weight: 700;
+        }
+        .badge-fecha {
+            background: #e9ecef;
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-container { width: 70px; }
+            .main-content { margin-left: 70px; padding: 15px; }
+            .menu-tooltip { font-size: 11px; white-space: nowrap; left: 40%;}
+            .step-header { padding: 14px 18px; font-size: 0.9rem; }
+        }
+        @media (max-width: 576px) {
+            .section-title { font-size: 1.5rem; }
+        }
+        .text-center { text-align: center; }
+        .fa, i { margin-right: 0px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar-container">
+    <nav>
+        <ul class="mcd-menu">
+            <li>
+                <a href="#" class="active"><i class="fa fa-home"></i></a>
+                <span class="menu-tooltip"><strong>Inicio</strong><small>Panel Principal</small></span>
+            </li>
+            <li>
+                <a href="#problemas"><i class="fa fa-search"></i></a>
+                <span class="menu-tooltip"><strong>Problemas</strong><small>Detección</small></span>
+            </li>
+            <li>
+                <a href="#kpis"><i class="fa fa-bar-chart"></i></a>
+                <span class="menu-tooltip"><strong>KPIs</strong><small>Indicadores Clave</small></span>
+            </li>
+            <li>
+                <a href="#ruta"><i class="fa fa-road"></i></a>
+                <span class="menu-tooltip"><strong>Ruta</strong><small>Mejora Continua</small></span>
+            </li>
+            <li>
+                <a href="#plan"><i class="fa fa-gears"></i></a>
+                <span class="menu-tooltip"><strong>Plan</strong><small>Intervención</small></span>
+            </li>
+            <!-- Espaciador flexible para empujar el perfil hacia abajo -->
+            <li class="menu-spacer"></li>
+            <!-- Nuevo item: Perfil / Créditos (hover muestra modal) -->
+            <li id="profileHoverItem">
+                <a href="javascript:void(0);"><i class="fa fa-user-circle-o"></i></a>
+                <span class="menu-tooltip"><strong>Créditos</strong><small>Autor & Docente</small></span>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="main-content">
+    <header>
+        <h1>🧺 Manual del Marchante</h1>
+        <p>Clima, Cultura y Evaluación Institucional | Calidad Educativa</p>
+    </header>
+
+    <div class="container-fluid px-0">
+
+        <!-- 🔎 SECCIÓN PROBLEMAS (ROJO) -->
+        <section id="problemas">
+            <h2 class="section-title title-problema">🔎 Problema Detectado</h2>
+            <div class="problem-grid" id="problemasGrid">
+                <div class="card-custom problem-card" data-desc="Falta de empatía, trato poco profesional y escasa disposición para apoyar, generando desmotivación y quejas."><strong>😞 Mala atención al alumno</strong></div>
+                <div class="card-custom problem-card" data-desc="Los alumnos no alcanzan objetivos académicos; fallas en enseñanza, evaluación o comprensión de contenidos."><strong>📉 Bajo nivel de aprendizaje</strong></div>
+                <div class="card-custom problem-card" data-desc="La información no fluye correctamente entre directivos, docentes y alumnos, provocando confusión y rumores."><strong>📢 Comunicación deficiente</strong></div>
+                <div class="card-custom problem-card" data-desc="Desacuerdos entre personal o con alumnos que no se gestionan adecuadamente, afectando el ambiente laboral."><strong>⚔️ Conflictos internos</strong></div>
+                <div class="card-custom problem-card" data-desc="Metodologías repetitivas, poca participación activa, bajo interés estudiantil."><strong>🎭 Clases poco dinámicas</strong></div>
+                <div class="card-custom problem-card" data-desc="Falta de cortesía, interrupciones y trato vertical que deteriora la confianza."><strong>🚫 Falta de respeto docente-alumno</strong></div>
+                <div class="card-custom problem-card" data-desc="Procesos burocráticos lentos, falta de respuestas oportunas a solicitudes."><strong>📬 Mala comunicación administrativa</strong></div>
+            </div>
+        </section>
+
+        <!-- 📊 KPIs (AZUL) bordes azules -->
+        <section id="kpis">
+            <h2 class="section-title title-kpi">📊 Indicadores Clave (KPIs)</h2>
+            <div class="kpi-grid">
+                <div class="card-custom kpi-card"><h3>🌡️ Clima Organizacional</h3><p>Percepción de ambiente laboral.</p><strong>Meta: ≥ 85%</strong></div>
+                <div class="card-custom kpi-card"><h3>🎓 Satisfacción del Estudiante</h3><p>Calidad del aprendizaje percibida.</p><strong>Meta: ≥ 90%</strong></div>
+                <div class="card-custom kpi-card"><h3>⚖️ Resolución de Conflictos</h3><p>Eficacia en resolver problemas.</p><strong>Meta: 95%</strong></div>
+                <div class="card-custom kpi-card"><h3>📈 Planeación Académica</h3><p>Cumplimiento del programa educativo.</p><strong>Meta: ≥ 90%</strong></div>
+                <div class="card-custom kpi-card"><h3>🔊 Comunicación</h3><p>Canales claros y efectivos.</p><strong>Meta: ≥ 90%</strong></div>
+            </div>
+        </section>
+
+        <!-- 🧭 RUTA CRÍTICA (VERDE) ACORDEÓN + bordes verdes -->
+        <section id="ruta">
+            <h2 class="section-title title-ruta">🧭 Ruta Crítica de Mejora</h2>
+            <div class="ruta-timeline" id="accordionRuta">
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>🔍 1. Diagnóstico</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Aplicar instrumentos para detectar problemas reales (encuestas, entrevistas, revisión de evidencias).</p>
+                        <div class="survey-example">
+                            <strong>📋 Ejemplo (Encuesta a alumnos):</strong><br>
+                            • ¿Cómo calificas la atención de tus docentes?<br>
+                            a) Excelente b) Buena c) Regular d) Mala<br>
+                            • ¿Con qué frecuencia entiendes los temas de clase?<br>
+                            a) Siempre b) Casi siempre c) A veces d) Nunca<br>
+                            👉 Complementar con entrevistas cortas y revisión de calificaciones.
+                        </div>
+                        <div class="tip-auditoria mt-2">💡 Complemento: análisis de actas, observaciones áulicas.</div>
+                    </div>
+                </div>
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>📏 2. Evaluación</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Comparar resultados con estándares institucionales tipo CACEI / CIEES.</p>
+                        <div class="survey-example">
+                            <strong>📊 Ejemplo concreto:</strong> Resultado encuesta atención: 60% positiva → Estándar esperado: ≥ 85% <br>
+                            ✅ Conclusión: incumplimiento → área crítica detectada.
+                        </div>
+                    </div>
+                </div>
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>📋 3. Plan de Acción</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Definir qué, quién y cuándo.</p>
+                        <div class="survey-example">
+                            <strong>🎯 Ejemplo:</strong> Objetivo: Mejorar atención docente al 85%<br>
+                            Acción: Taller de trato y didáctica | Responsable: Coordinador académico<br>
+                            Tiempo: 1 mes | 📄 Todo documentado.
+                        </div>
+                    </div>
+                </div>
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>⚙️ 4. Implementación</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Ejecutar las acciones definidas.</p>
+                        <div class="survey-example">
+                            Ejemplo: Realizar taller de capacitación docente, aplicar nuevas estrategias, reuniones semanales.<br>
+                            🧾 Registrar evidencia: listas, fotos, reportes.
+                        </div>
+                    </div>
+                </div>
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>📈 5. Seguimiento</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Medir KPIs constantemente, reaplicar instrumentos.</p>
+                        <div class="survey-example">
+                            🔁 Reaplicar encuesta al mes. Medir: Satisfacción del alumno, nivel de aprobación.<br>
+                            📉 Comparar resultados antes vs después.
+                        </div>
+                    </div>
+                </div>
+                <div class="ruta-accordion-item">
+                    <div class="step-header"><strong>🔄 6. Mejora Continua</strong> <span class="toggle-icon">+</span></div>
+                    <div class="step-details">
+                        <p><strong>📌 Cómo hacerlo:</strong> Ajustar con base en resultados (enfoque Kaizen).</p>
+                        <div class="survey-example">
+                            ✅ Si mejora fue baja → reforzar capacitación.<br>
+                            ✅ Si hubo avance → estandarizar prácticas exitosas.<br>
+                            Ciclo: mejorar → medir → ajustar.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ⚙️ PLAN INTERVENCIÓN -->
+        <section id="plan">
+            <h2 class="section-title title-plan">⚙️ Plan de Intervención</h2>
+            <p class="text-center text-muted mb-4">(Haz clic en cada tarjeta para ver detalles)</p>
+            <div class="plan-grid">
+                <div class="card-custom plan-item" data-bs-toggle="modal" data-bs-target="#modalDocente"><i class="fa fa-graduation-cap"></i> <strong>Capacitación docente</strong></div>
+                <div class="card-custom plan-item" data-bs-toggle="modal" data-bs-target="#modalComms"><i class="fa fa-bullhorn"></i> <strong>Mejora de comunicación</strong></div>
+                <div class="card-custom plan-item" data-bs-toggle="modal" data-bs-target="#modalConflictos"><i class="fa fa-handshake-o"></i> <strong>Resolución de conflictos</strong></div>
+                <div class="card-custom plan-item" data-bs-toggle="modal" data-bs-target="#modalIncentivos"><i class="fa fa-trophy"></i> <strong>Incentivos laborales</strong></div>
+            </div>
+        </section>
+
+        <!-- 📈 INDICADORES DE ÉXITO (AMARILLO) -->
+        <section>
+            <h2 class="section-title title-exito">📈 Indicadores de Éxito</h2>
+            <div class="exito-grid">
+                <div class="card-custom exito-card"><strong>➕ 90% satisfacción</strong><br>estudiantil</div>
+                <div class="card-custom exito-card"><strong>➖ 50% conflictos</strong><br>reportados</div>
+                <div class="card-custom exito-card"><strong>📈 ↑ rendimiento académico</strong><br>en evaluaciones</div>
+                <div class="card-custom exito-card"><strong>👩‍🏫 ↑ participación docente</strong><br>en formación continua</div>
+            </div>
+        </section>
+
+        <footer>
+            <p>🫵 “Un buen marchante no solo vende, también cuida la calidad de su producto y el trato a su cliente.”</p>
+            <small>Mejora continua · Gestión del clima · Cultura de calidad</small>
+        </footer>
+    </div>
+</div>
+
+<!-- MODALES existentes (Plan de intervención) -->
+<div class="modal fade" id="modalDocente" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">🎓 Capacitación Docente</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h6>Estrategia: Microformación práctica + seguimiento</h6><ul><li>Talleres cortos: didáctica activa, manejo de grupo.</li><li>Role play con retroalimentación.</li><li>Observación en aula + checklist.</li></ul><div class="tip-auditoria">⚡ Tip Auditoría: listas de asistencia y fotos.</div></div></div></div></div>
+<div class="modal fade" id="modalComms" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">📢 Mejora de Comunicación</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h6>Estrategia: Estructura + canales claros</h6><ul><li>Reunión semanal breve (máx 30 min).</li><li>Canal oficial único.</li><li>Minutas con acuerdos y responsables.</li></ul><div class="tip-auditoria">⚡ Archivar minutas firmadas.</div></div></div></div></div>
+<div class="modal fade" id="modalConflictos" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">🤝 Resolución de Conflictos</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h6>Protocolo formal + mediación</h6><ol><li>Reporte formal.</li><li>Mediación neutral.</li><li>Acuerdo firmado.</li></ol><div class="tip-auditoria">⚡ Bitácora de casos clave para acreditación.</div></div></div></div></div>
+<div class="modal fade" id="modalIncentivos" tabindex="-1" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">🏆 Incentivos Laborales</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><h6>Reconocimiento + motivación visible</h6><ul><li>Reconocimiento mensual docente destacado.</li><li>Incentivos no económicos: constancias, menciones.</li><li>Vinculación con KPIs.</li></ul><div class="tip-auditoria">⚡ Documentar criterios de selección.</div></div></div></div></div>
+
+<!-- MODAL DE CRÉDITOS (perfil) - se abre al pasar el mouse sobre el icono -->
+<div class="modal fade modal-creditos" id="creditosModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-id-card" style="margin-right: 8px;"></i> Créditos Institucionales</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="credito-item">
+                    <div class="credito-icon"><i class="fa fa-user-circle"></i></div>
+                    <div class="credito-text"><strong>Ing. Héctor L. Pérez Ramírez</strong><br><span class="text-muted">Autor & Desarrollo</span></div>
+                </div>
+                <div class="credito-item">
+                    <div class="credito-icon"><i class="fa fa-chalkboard-teacher"></i></div>
+                    <div class="credito-text"><strong>Docente a cargo:</strong> Dr. Marvin Rodríguez Perusquía</div>
+                </div>
+                <div class="credito-item">
+                    <div class="credito-icon"><i class="fa fa-graduation-cap"></i></div>
+                    <div class="credito-text"><strong>Gestión Educativa</strong><br>Supervisión y seguimiento académico</div>
+                </div>
+                <div class="credito-item">
+                    <div class="credito-icon"><i class="fa fa-calendar-check-o"></i></div>
+                    <div class="credito-text"><strong>Fecha de elaboración:</strong> <span class="badge-fecha">26-abr-26</span></div>
+                </div>
+                <hr class="my-3">
+                <div class="text-center mt-2">
+                    <small class="text-secondary"><i class="fa fa-leaf"></i> Manual interactivo de mejora continua - Calidad educativa</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function() {
+        // 1. EFECTO GIRAR + MOSTRAR DESCRIPCIÓN EN TARJETAS DE PROBLEMA
+        const problemCards = document.querySelectorAll('.problem-card');
+        problemCards.forEach(card => {
+            const originalText = card.innerHTML;
+            const description = card.getAttribute('data-desc');
+            if (!description) return;
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('rotate-desc-active');
+                this.innerHTML = `<span class="desc-text">📌 ${description}</span>`;
+            });
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('rotate-desc-active');
+                this.innerHTML = originalText;
+            });
+        });
+
+        // 2. ACORDEÓN PARA RUTA CRÍTICA
+        const accordionItems = document.querySelectorAll('.ruta-accordion-item');
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.step-header');
+            const detailsDiv = item.querySelector('.step-details');
+            const iconSpan = header.querySelector('.toggle-icon');
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = detailsDiv.classList.contains('show');
+                document.querySelectorAll('.step-details').forEach(detail => {
+                    if(detail !== detailsDiv && detail.classList.contains('show')) {
+                        detail.classList.remove('show');
+                        const parentItem = detail.closest('.ruta-accordion-item');
+                        if(parentItem) {
+                            const parentIcon = parentItem.querySelector('.toggle-icon');
+                            if(parentIcon) parentIcon.textContent = '+';
+                        }
+                    }
+                });
+                if(!isOpen) {
+                    detailsDiv.classList.add('show');
+                    iconSpan.textContent = '−';
+                } else {
+                    detailsDiv.classList.remove('show');
+                    iconSpan.textContent = '+';
+                }
+            });
+        });
+
+        // 3. Resaltado de menú activo según scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.mcd-menu li a');
+        function setActiveLink() {
+            let current = '';
+            const scrollPos = window.scrollY + 120;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if(scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                if(href === `#${current}` || (current === '' && href === '#')) {
+                    link.classList.add('active');
+                } else if(current === '' && href === '#') {
+                    link.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', setActiveLink);
+        window.addEventListener('load', setActiveLink);
+        
+        // smooth scroll para enlaces internos
+        document.querySelectorAll('.mcd-menu li a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if(targetId && targetId !== '#') {
+                    const targetElement = document.querySelector(targetId);
+                    if(targetElement) {
+                        e.preventDefault();
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        history.pushState(null, null, targetId);
+                        setActiveLink();
+                    }
+                } else if(targetId === '#') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    document.querySelector('.mcd-menu li a[href="#"]').classList.add('active');
+                }
+            });
+        });
+
+        // 4. NUEVA FUNCIONALIDAD: HOVER sobre ícono de perfil muestra modal con transición
+        const profileItem = document.getElementById('profileHoverItem');
+        let modalInstance = null;
+        // Inicializar modal solo una vez (para evitar reaperturas conflictivas)
+        const modalElement = document.getElementById('creditosModal');
+        if (modalElement) {
+            modalInstance = new bootstrap.Modal(modalElement, {
+                keyboard: true,
+                backdrop: true
+            });
+        }
+
+        let hoverTimeout = null;
+        if (profileItem && modalInstance) {
+            profileItem.addEventListener('mouseenter', function(e) {
+                // Evitar múltiples aperturas seguidas con un pequeño retardo para mejorar UX
+                if (hoverTimeout) clearTimeout(hoverTimeout);
+                hoverTimeout = setTimeout(() => {
+                    if (modalInstance) {
+                        modalInstance.show();
+                    }
+                }, 100); // pequeño delay para que no se dispare accidentalmente
+            });
+            // Opcional: también permitir cerrar si se mouseleave, pero no es necesario; el modal se cierra con click fuera o botón
+            profileItem.addEventListener('mouseleave', function() {
+                if (hoverTimeout) clearTimeout(hoverTimeout);
+                // No forzamos cierre automático para no interrumpir lectura
+            });
+        }
+
+        // Ajuste extra para mobile: No interferir con clics
+        const style = document.createElement('style');
+        style.textContent = `@media (max-width: 480px) { .menu-tooltip { font-size: 10px; padding: 5px 12px; white-space: nowrap; left: 45%; } }`;
+        document.head.appendChild(style);
+        
+        console.log("Manual del Marchante - Modo interactivo + modal por hover activado");
+    })();
+</script>
+
+<style>
+    /* ajustes extras para cards y modal */
+    .problem-card {
+        transition: transform 0.25s ease, background 0.2s, box-shadow 0.2s;
+    }
+    .rotate-desc-active {
+        transform: rotate(1deg) scale(1.02);
+        background: #ffeaea;
+        box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+    }
+    .desc-text {
+        font-size: 0.9rem;
+        display: block;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+    .kpi-card h3, .kpi-card p, .kpi-card strong {
+        color: #1e4663;
+    }
+    .exito-card strong {
+        font-size: 1.2rem;
+        color: #c97e00;
+    }
+    .exito-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .plan-grid .card-custom i {
+        margin-right: 12px;
+        font-size: 1.3rem;
+    }
+    .step-details p, .step-details .survey-example {
+        margin-bottom: 12px;
+    }
+    .menu-spacer {
+        flex: 1;
+        list-style: none;
+        pointer-events: none;
+    }
+    /* transición modal suave */
+    .modal.fade .modal-dialog {
+        transition: transform 0.25s ease-out, opacity 0.2s;
+    }
+</style>
+</body>
+</html>
